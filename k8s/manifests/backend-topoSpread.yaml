@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-zone-aware
+  labels:
+    app: backend-zone-aware
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: backend-zone-aware
+  template:
+    metadata:
+      labels:
+        app: backend-zone-aware
+    spec:
+      containers:
+        - name: backend
+          image: nginx:latest
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 40m
+              memory: 100Mi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: backend-zone-aware
